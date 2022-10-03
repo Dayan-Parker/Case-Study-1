@@ -47,4 +47,39 @@ figure
 %make sure they match
 
 %kmeans(all_diffs,9)
+-------------------------------------
+load('COVIDbyCounty.mat')
+temp = CNTY_COVID.';
+temp1 = corr(temp);
+plot(temp1);
+max1 = max(temp1);
+subplot(1,2,1)
+plot(temp1(1,:));
+subplot(1,2,2)
+plot(temp1(10,:));
 
+CNTY_COVID_TRAIN=[CNTY_COVID(1:215,:)];  %segment the data into train / test
+CNTY_COVID_TEST=[CNTY_COVID(216:225,:)];  %segment the data into train / text
+
+SUM_CNTY_COVID_TRAIN=sum(CNTY_COVID_TRAIN.');  %for each county, across its timestamps, add the incremental # of cases for the case total
+figure
+pareto(SUM_CNTY_COVID_TRAIN,1);
+
+
+temp3 = kmeans(CNTY_COVID_TRAIN,9);
+sil1 = silhouette(CNTY_COVID_TRAIN, temp3);
+figure
+[sil1, H] = silhouette(CNTY_COVID_TRAIN, temp3);
+
+count=1;
+for i=2:100
+[junk1,junk2,sumd] = kmeans(CNTY_COVID_TRAIN,i);
+tempk(:,count)=junk1;
+silk(:,count)=silhouette(CNTY_COVID_TRAIN,tempk(:,count)); 
+%figure
+%[silk(:,count), H] = silhouette(CNTY_COVID_TRAIN, tempk(:,count)); 
+Sum_of_SquDist(count)=sum(sumd);
+count=count+1;
+end
+figure
+plot(Sum_of_SquDist);
